@@ -555,4 +555,7 @@ PHP_Laravel12_Laravisit/
 
 Your PHP_Laravel12_Laravisit Project is now ready!
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> development
