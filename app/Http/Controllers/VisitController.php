@@ -7,13 +7,11 @@ use App\Models\Visit;
 
 class VisitController extends Controller
 {
-    // Show homepage
     public function index()
     {
-        return view('home'); 
+        return view('home');
     }
 
-    // Track visitor
     public function track(Request $request)
     {
         Visit::create([
@@ -25,10 +23,38 @@ class VisitController extends Controller
         return response()->json(['message' => 'Visit tracked successfully']);
     }
 
-    // Display all visits
-    public function visits()
+    // ✅ UPDATED: search + pagination
+    public function visits(Request $request)
     {
-        $visits = Visit::latest()->paginate(20);
-        return view('visits.index', compact('visits'));
+        $search = $request->search;
+
+        $visits = Visit::when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ip_address', 'like', "%$search%")
+                    ->orWhere('url', 'like', "%$search%")
+                    ->orWhere('user_agent', 'like', "%$search%")
+                    ->orWhere('id', 'like', "%$search%");
+            });
+        })
+            ->orderBy('id', 'asc')
+            ->paginate(5);
+
+        return view('visits.index', compact('visits', 'search'));
+    }
+
+    // ✅ DELETE SINGLE VISIT
+    public function destroy($id)
+    {
+        Visit::findOrFail($id)->delete();
+
+        return redirect()->back()->with('success', 'Visit deleted successfully!');
+    }
+
+    // ✅ DELETE ALL VISITS
+    public function destroyAll()
+    {
+        Visit::truncate();
+
+        return redirect()->back()->with('success', 'All visits deleted successfully!');
     }
 }
