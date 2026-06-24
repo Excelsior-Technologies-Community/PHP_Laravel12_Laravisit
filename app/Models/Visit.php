@@ -12,6 +12,7 @@ class Visit extends Model
     protected $fillable = [
         'ip_address',
         'user_agent',
-        'url',
+        'page_url',
+        'referer',
     ];
 }
